@@ -238,6 +238,7 @@ class HTML2Text(HTMLParser.HTMLParser):
         self.abbr_data = None  # last inner HTML (for abbr being defined)
         self.abbr_list = {}  # stack of abbreviations to write later
         self.baseurl = baseurl
+        self.previous_tag = ''
 
         try: del unifiable_n[name2cp('nbsp')]
         except KeyError: pass
@@ -282,6 +283,7 @@ class HTML2Text(HTMLParser.HTMLParser):
         self.handle_tag(tag, attrs, 1)
 
     def handle_endtag(self, tag):
+        self.previous_tag = tag
         self.handle_tag(tag, None, 0)
 
     def previousIndex(self, attrs):
@@ -398,6 +400,8 @@ class HTML2Text(HTMLParser.HTMLParser):
                     parent_style = self.tag_stack[-1][2]
 
         if hn(tag):
+            if hn(self.previous_tag) == hn(tag):
+                return
             self.p()
             if start:
                 self.inheader = True
